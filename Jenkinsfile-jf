@@ -25,19 +25,16 @@ pipeline {
                     -Dsonar.projectKey=admission_service    \
                     -Dsonar.sources=src                     \
                     -Dsonar.host.url=https://sonarcloud.io  \
-                    -Dsonar.javascript.lcov.reportPaths=coverage'
+                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info'
                 }
             }
         }
         stage('Quality Gate'){
             steps {
-                script {
-                    timeout(time: 10, unit: 'MINUTES') {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error 'Pipeline aborted due to quality gate failure: ${qg.status}'
-                        }
-                    }
+               timeout(time: 1, unit: 'HOURS') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -52,6 +49,17 @@ pipeline {
                 sh 'docker tag at20_admission_service jhoelfloress/admission_service'
                 sh 'docker push jhoelfloress/admission_service'
            }
+        }
+        stage('DeployToDev'){
+            steps {
+                sh 'deocker compose -f compose.jf.yaml up -d'
+                sh 'run tests'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker image prune -a'
         }
     }
 }
