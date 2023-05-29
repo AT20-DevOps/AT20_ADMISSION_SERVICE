@@ -52,7 +52,7 @@ pipeline {
         }
         stage('DeployToDev'){
             steps {
-                sh 'deocker compose -f compose.jf.yaml up -d'
+                sh 'docker compose -f compose.jf.yaml up -d'
                 sh 'run tests'
             }
         }
