@@ -4,7 +4,7 @@ pipeline {
         DOCKER_PASS = credentials('docker_pass')
         SONAR_TOKEN = credentials('sonar_token')
         TARGET_HOST = '192.168.56.61'
-        GIT_COMMIT_HASH = sh (script: "git rev-parse --short HEAD", returnStdout: true)
+        GIT_COMMIT_HASH = sh (script: "git rev-parse --short HEAD", returnStdout: true).trim()
         //GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
     }
     stages {
@@ -64,7 +64,7 @@ pipeline {
         }
         stage('DeployToAuto'){
             steps {
-                sh 'DOCKER_HOST=ssh://$TARGET_HOST docker-compose -f docker-compose-evv.yaml up -d'
+                sh 'TAG_VERSION=${GIT_COMMIT_HASH} DOCKER_HOST=ssh://$TARGET_HOST docker-compose -f docker-compose-evv.yaml up -d'
                 sh 'echo command to run smoke test'
             }
         }
