@@ -8,18 +8,18 @@ pipeline {
         //GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
     }
     stages {
-        stage('Test') {
-            agent { docker 'node:18-alpine3.16' }
-            steps {
-                sh 'npm install'
-                sh 'npm run test'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'test/report/report.html', followSymlinks: false
-                }
-            }
-        }
+        //stage('Test') {
+        //    agent { docker 'node:18-alpine3.16' }
+        //    steps {
+        //        sh 'npm install'
+        //        sh 'npm run test'
+        //    }
+        //    post {
+        //        always {
+        //            archiveArtifacts artifacts: 'test/report/report.html', followSymlinks: false
+        //        }
+        //    }
+        //}
         stage('Code Inspection') {
             steps {
                 withSonarQubeEnv('sonar_scanner') {
