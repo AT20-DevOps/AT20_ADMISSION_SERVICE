@@ -11,7 +11,6 @@ pipeline {
         stage('Test') {
             agent { docker 'node:18-alpine3.16' }
             steps {
-                sh './gradlew clean build test'
                 sh 'npm install'
                 sh 'npx jest'
             }
