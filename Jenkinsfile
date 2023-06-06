@@ -12,7 +12,7 @@ pipeline {
             agent { docker 'node:18-alpine3.16' }
             steps {
                 sh 'npm install'
-                sh 'npx jest'
+                sh 'npm run test'
             }
             post {
                 always {
