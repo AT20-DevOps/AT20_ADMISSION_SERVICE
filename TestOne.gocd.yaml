@@ -38,8 +38,6 @@ pipelines:
             - build:
                 source: test/report/report.html
                 destination: html_report
-            - build:
-                source: Dockerfile
     - code-inspection:
         fetch_materials: false
         keep_artifacts: false
