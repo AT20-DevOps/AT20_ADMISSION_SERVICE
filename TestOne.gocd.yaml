@@ -38,6 +38,8 @@ pipelines:
             - build:
                 source: test/report/report.html
                 destination: html_report
+            - build:
+                source: Dockerfile
     - code-inspection:
         fetch_materials: false
         keep_artifacts: false
@@ -59,7 +61,7 @@ pipelines:
                     -Dsonar.sources=. \
                     -Dsonar.host.url=https://sonarcloud.io
     - PackageandPublish:
-        fetch_materials: false
+        fetch_materials: true
         keep_artifacts: false
         clean_workspace: false
         approval:
