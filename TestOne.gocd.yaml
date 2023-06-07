@@ -28,7 +28,7 @@ pipelines:
             tasks:
             - script: |
                 npm install
-                npm test
+                npm run test
             artifacts:
             - build:
                 source: test/report/report.html
