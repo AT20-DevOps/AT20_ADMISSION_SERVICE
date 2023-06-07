@@ -75,7 +75,7 @@ pipelines:
             tasks:
             - script: |
                 docker build -t at20_admission_service .
-                docker login -u esther12345 -p ${DOCKER_PASS}
+                docker login -u esther12345 --password-stdin <<< ${DOCKER_PASS}
                 docker tag at20_admission_service esther12345/admission_service:${GIT_COMMIT_HASH}
                 docker push esther12345/admission_service:${GIT_COMMIT_HASH}
 
