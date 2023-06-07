@@ -5,7 +5,7 @@ pipelines:
     label_template: ${COUNT}
     lock_behavior: none
     display_order: -1
-    environment_variable:
+    environment_variables:
       GIT_COMMIT_HASH: 1.2
     secure_variables:
       SONAR_TOKEN: AES:YnrDUaQNfiG+DS1J7EJ1Rg==:eHEM3Cyt0C+z7Pyt0r1sImVI+Yz2kdEHnQOge1S+M8UUz0/f3mapDe5OCalFlJRl
