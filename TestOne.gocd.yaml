@@ -41,7 +41,6 @@ pipelines:
                 source: test/report/report.html
                 destination: html_report
             - build:
-                source: Dockerfile
                 source: gitHash.txt
     - code-inspection:
         fetch_materials: false
