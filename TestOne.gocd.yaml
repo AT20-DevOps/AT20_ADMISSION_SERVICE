@@ -32,8 +32,8 @@ pipelines:
             - ubuntu
             tasks:
             - script: |
-                git rev-parse --short HEAD > gitHash.txt
-                export GIT_COMMIT_HASH=$(cat gitHash.txt)
+                git rev-parse --short HEAD > gitH.txt
+                export GIT_COMMIT_HASH=$(cat gitH.txt)
                 npm install
                 npm run test
             artifacts:
@@ -41,7 +41,9 @@ pipelines:
                 source: test/report/report.html
                 destination: html_report
             - build:
-                source: gitHash.txt
+                source: Dockerfile
+            - build:
+                source: gitH.txt
     - code-inspection:
         fetch_materials: false
         keep_artifacts: false
@@ -76,7 +78,7 @@ pipelines:
             - docker
             tasks:
             - script: |
-                export GIT_COMMIT_HASH=$(cat gitHash.txt)
+                export GIT_COMMIT_HASH=$(cat gitH.txt)
                 docker build -t at20_admission_service .
                 docker login -u esther12345 --password-stdin <<< ${DOCKER_PASS}
                 docker tag at20_admission_service esther12345/admission_service:${GIT_COMMIT_HASH}
@@ -95,6 +97,7 @@ pipelines:
       TestOne:
         pipeline: TestOne
         stage: PackageAndPublish
+        TARGET_HOST: 192.168.0.19
     stages:
     - DeployToDev:
         fetch_materials: false
@@ -113,7 +116,7 @@ pipelines:
                 pipeline: TestOne
                 stage: Test
                 job: unit-test
-                source: gitHash.txt
+                source: gitH.txt
                 is_file: true
                 run_if: passed
             - fetch:
@@ -124,7 +127,7 @@ pipelines:
                 is_file: true
                 run_if: passed
             - script: |
-                export GIT_COMMIT_HASH=$(cat gitHash.txt)
+                export GIT_COMMIT_HASH=$(cat gitH.txt)
                 export TAG_VERSION=${GIT_COMMIT_HASH} && docker-compose -f docker-compose-evv.yaml up -d
     - Smoke:
         fetch_materials: false
@@ -134,54 +137,32 @@ pipelines:
           type: success
           allow_only_on_success: false
         jobs:
-          test:
+          deployToDev:
             timeout: 0
-            resources:
-            - docker
-            tasks:
-            - script: |
-                echo command to run smoke test 
-  Capacity_testing:
-    group: AT20Group
-    label_template: ${COUNT}
-    lock_behavior: none
-    display_order: -1
-    environment_variables:
-      GIT_COMMIT_HASH: 1.2
-      TARGET_HOST: 192.168.0.19
-    materials:
-      TestOne:
-        pipeline: TestOne
-        stage: PackageAndPublish
-    stages:
-    - DeployToAUTO:
-        fetch_materials: false
-        keep_artifacts: false
-        clean_workspace: false
-        approval:
-          type: success
-          allow_only_on_success: false
-        jobs:
-          deployToAUTO:
-            timeout: 0
-            resources:
+            resources :
             - docker
             tasks:
             - fetch:
                 pipeline: TestOne
-                stage: Test
+                stage: TestOne
                 job: unit-test
-                source: gitHash.txt
+                source: gitH.txt
                 is_file: true
                 run_if: passed
-            - fetch:
+            - fetch: 
                 pipeline: TestOne
                 stage: PackageAndPublish
                 job: docker
                 source: docker-compose-evv.yaml
                 is_file: true
                 run_if: passed
+            - fetch: 
+                pipeline: TestOne
+                stage: PackageAndPublish
+                job: docker
+                is_file: true
+                run_if: passed
             - script: |
-                export GIT_COMMIT_HASH=$(cat gitHash.txt)
-                export TAG_VERSION=${GIT_COMMIT_HASH} 
+                export GIT_COMMIT_HASH=$(cat gitH.txt)
+                export TAG_VERSION=${GIT_COMMIT_HASH}
                 DOCKER_HOST=ssh://$TARGET_HOST docker-compose -f docker-compose-evv.yaml up -d
